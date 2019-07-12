@@ -2,6 +2,8 @@
 
 flutter SeekBar
 
+![示例](readme/readme.gif)
+
 ## Getting Started
 
 ```dart

@@ -1,8 +1,8 @@
 name: seekbar
 description: flutter seekbar
-version: 0.0.1
+version: 0.0.2
 author: zourw<zrw0820@gmail.com>
-homepage: https://github.com/zourw
+homepage: https://github.com/zourw/flutter_seekbar.git
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
