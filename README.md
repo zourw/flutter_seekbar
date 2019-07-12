@@ -1,6 +1,6 @@
-# seekBar
+# SeekBar
 
-flutter seekBar
+flutter SeekBar
 
 ## Getting Started
 
