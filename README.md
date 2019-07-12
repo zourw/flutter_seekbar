@@ -2,7 +2,7 @@
 
 flutter SeekBar
 
-![示例](readme/readme.gif)
+![示例](https://raw.githubusercontent.com/zourw/flutter_seekbar/master/readme/readme.gif)
 
 ## Getting Started
 
