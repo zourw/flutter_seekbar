@@ -28,6 +28,7 @@ class SeekBar extends StatefulWidget {
   final Color thumbColor;
   final Function onStartTrackingTouch;
   final ValueChanged<double> onProgressChanged;
+  final ValueChanged<double> onTouch;
   final Function onStopTrackingTouch;
 
   SeekBar({
@@ -42,6 +43,7 @@ class SeekBar extends StatefulWidget {
     this.thumbColor = Colors.white,
     this.onStartTrackingTouch,
     this.onProgressChanged,
+    this.onTouch,
     this.onStopTrackingTouch,
   }) : super(key: key);
 
@@ -114,6 +116,17 @@ class _SeekBarState extends State<SeekBar> {
         });
         if (widget.onProgressChanged != null) {
           widget.onProgressChanged(_value);
+        }
+      },
+      onTapDown: (details){
+        RenderBox box = context.findRenderObject();
+        _touchPoint = box.globalToLocal(details.globalPosition);
+        _checkTouchPoint();
+        setState(() {
+          _setValue();
+        });
+        if (widget.onTouch != null) {
+          widget.onTouch(_value);
         }
       },
       onHorizontalDragEnd: (details) {
