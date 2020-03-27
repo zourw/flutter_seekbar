@@ -29,6 +29,8 @@ class SeekBar extends StatefulWidget {
   final Function onStartTrackingTouch;
   final ValueChanged<double> onProgressChanged;
   final Function onStopTrackingTouch;
+  final bool verticalPadding;
+  final bool horizontalPadding;
 
   SeekBar({
     Key key,
@@ -43,6 +45,8 @@ class SeekBar extends StatefulWidget {
     this.onStartTrackingTouch,
     this.onProgressChanged,
     this.onStopTrackingTouch,
+    this.verticalPadding = true,
+    this.horizontalPadding = true,
   }) : super(key: key);
 
   @override
@@ -137,6 +141,8 @@ class _SeekBarState extends State<SeekBar> {
             secondProgressColor: widget.secondProgressColor,
             thumbColor: widget.thumbColor,
             touchDown: _touchDown,
+            verticalPadding: widget.verticalPadding,
+            horizontalPadding: widget.horizontalPadding,
           ),
         ),
       ),
@@ -154,6 +160,8 @@ class _SeekBarPainter extends CustomPainter {
   final Color secondProgressColor;
   final Color thumbColor;
   final bool touchDown;
+  final bool verticalPadding;
+  final bool horizontalPadding;
 
   _SeekBarPainter({
     this.progressWidth,
@@ -165,6 +173,8 @@ class _SeekBarPainter extends CustomPainter {
     this.secondProgressColor,
     this.thumbColor,
     this.touchDown,
+    this.verticalPadding,
+    this.horizontalPadding,
   });
 
   @override
@@ -181,15 +191,16 @@ class _SeekBarPainter extends CustomPainter {
       ..strokeCap = StrokeCap.square
       ..strokeWidth = progressWidth;
 
-    final centerY = size.height / 2.0;
-    final barLength = size.width - thumbRadius * 2.0;
+    final centerY = verticalPadding ? (size.height / 2.0) : size.height;
+    final paddingX = (horizontalPadding ? thumbRadius : 0.0);
+    final barLength = size.width - paddingX * 2.0;
 
-    final Offset startPoint = Offset(thumbRadius, centerY);
-    final Offset endPoint = Offset(size.width - thumbRadius, centerY);
+    final Offset startPoint = Offset(paddingX, centerY);
+    final Offset endPoint = Offset(size.width - paddingX, centerY);
     final Offset progressPoint =
-        Offset(barLength * value + thumbRadius, centerY);
+        Offset(barLength * value + paddingX, centerY);
     final Offset secondProgressPoint =
-        Offset(barLength * secondValue + thumbRadius, centerY);
+        Offset(barLength * secondValue + paddingX, centerY);
 
     paint.color = barColor;
     canvas.drawLine(startPoint, endPoint, paint);
