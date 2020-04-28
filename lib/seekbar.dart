@@ -105,9 +105,8 @@ class _SeekBarState extends State<SeekBar> {
           _setValue();
           _touchDown = true;
         });
-        if (widget.onStartTrackingTouch != null) {
-          widget.onStartTrackingTouch();
-        }
+
+        widget.onStartTrackingTouch?.call();
       },
       onHorizontalDragUpdate: (details) {
         RenderBox box = context.findRenderObject();
@@ -116,17 +115,16 @@ class _SeekBarState extends State<SeekBar> {
         setState(() {
           _setValue();
         });
-        if (widget.onProgressChanged != null) {
-          widget.onProgressChanged(_value);
-        }
+
+        widget.onProgressChanged?.call(_value);
       },
       onHorizontalDragEnd: (details) {
         setState(() {
           _touchDown = false;
         });
-        if (widget.onStopTrackingTouch != null) {
-          widget.onStopTrackingTouch();
-        }
+
+        widget.onProgressChanged?.call(_value);
+        widget.onStopTrackingTouch?.call();
       },
       child: Container(
         constraints: BoxConstraints.expand(height: widget.thumbRadius * 2),
