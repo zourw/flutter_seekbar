@@ -62,10 +62,7 @@ class _SeekBarState extends State<SeekBar> {
   double _secondValue = 0.0;
 
   bool _touchDown = false;
-
-  _setValue() {
-    _value = _touchPoint.dx / context.size.width;
-  }
+  double _dragValue;
 
   _checkTouchPoint() {
     if (_touchPoint.dx <= 0) {
@@ -96,13 +93,19 @@ class _SeekBarState extends State<SeekBar> {
 
   @override
   Widget build(BuildContext context) {
+    void updateValue() {
+      _value = _touchPoint.dx / context.size.width;
+      _dragValue = _value;
+    }
+
     return GestureDetector(
       onHorizontalDragDown: (details) {
         RenderBox box = context.findRenderObject();
         _touchPoint = box.globalToLocal(details.globalPosition);
         _checkTouchPoint();
+
         setState(() {
-          _setValue();
+          updateValue();
           _touchDown = true;
         });
 
@@ -112,19 +115,19 @@ class _SeekBarState extends State<SeekBar> {
         RenderBox box = context.findRenderObject();
         _touchPoint = box.globalToLocal(details.globalPosition);
         _checkTouchPoint();
-        setState(() {
-          _setValue();
-        });
 
-        widget.onProgressChanged?.call(_value);
+        setState(() =>updateValue());
+
+        widget.onProgressChanged?.call(_dragValue);
       },
       onHorizontalDragEnd: (details) {
+        widget.onProgressChanged?.call(_dragValue);
+        widget.onStopTrackingTouch?.call();
+
         setState(() {
           _touchDown = false;
+          _dragValue = null;
         });
-
-        widget.onProgressChanged?.call(_value);
-        widget.onStopTrackingTouch?.call();
       },
       child: Container(
         constraints: BoxConstraints.expand(height: widget.thumbRadius * 2),
@@ -132,7 +135,7 @@ class _SeekBarState extends State<SeekBar> {
           painter: _SeekBarPainter(
             progressWidth: widget.progressWidth,
             thumbRadius: widget.thumbRadius,
-            value: _value,
+            value: _dragValue ?? _value,
             secondValue: _secondValue,
             barColor: widget.barColor,
             progressColor: widget.progressColor,
