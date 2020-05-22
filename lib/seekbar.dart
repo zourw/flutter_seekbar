@@ -100,6 +100,8 @@ class _SeekBarState extends State<SeekBar> {
 
     return GestureDetector(
       onHorizontalDragDown: (details) {
+        debugPrint("[SeekBar] onHorizontalDragDown");
+
         RenderBox box = context.findRenderObject();
         _touchPoint = box.globalToLocal(details.globalPosition);
         _checkTouchPoint();
@@ -112,6 +114,8 @@ class _SeekBarState extends State<SeekBar> {
         widget.onStartTrackingTouch?.call();
       },
       onHorizontalDragUpdate: (details) {
+        debugPrint("[SeekBar] onHorizontalDragUpdate");
+
         RenderBox box = context.findRenderObject();
         _touchPoint = box.globalToLocal(details.globalPosition);
         _checkTouchPoint();
@@ -121,13 +125,14 @@ class _SeekBarState extends State<SeekBar> {
         widget.onProgressChanged?.call(_dragValue);
       },
       onHorizontalDragEnd: (details) {
-        widget.onProgressChanged?.call(_dragValue);
-        widget.onStopTrackingTouch?.call();
+        debugPrint("[SeekBar] onHorizontalDragEnd");
 
-        setState(() {
-          _touchDown = false;
-          _dragValue = null;
-        });
+        _onGestureEnd();
+      },
+      onTap: () {
+        debugPrint("[SeekBar] onTap");
+
+        _onGestureEnd();
       },
       child: Container(
         constraints: BoxConstraints.expand(height: widget.thumbRadius * 2),
@@ -148,6 +153,16 @@ class _SeekBarState extends State<SeekBar> {
         ),
       ),
     );
+  }
+
+  void _onGestureEnd() {
+    widget.onProgressChanged?.call(_dragValue);
+    widget.onStopTrackingTouch?.call();
+    
+    setState(() {
+      _touchDown = false;
+      _dragValue = null;
+    });
   }
 }
 
