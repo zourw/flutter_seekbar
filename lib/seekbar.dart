@@ -31,9 +31,11 @@ class SeekBar extends StatefulWidget {
   final Function onStopTrackingTouch;
   final bool verticalPadding;
   final bool horizontalPadding;
+  final Key gestureDetectorKey;
 
   SeekBar({
     Key key,
+    this.gestureDetectorKey,
     this.progressWidth = 2.0,
     this.thumbRadius = 7.0,
     this.value = 0.0,
@@ -99,6 +101,7 @@ class _SeekBarState extends State<SeekBar> {
     }
 
     return GestureDetector(
+      key: widget.gestureDetectorKey,
       onHorizontalDragDown: (details) {
         debugPrint("[SeekBar] onHorizontalDragDown");
 
