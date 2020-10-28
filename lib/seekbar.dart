@@ -1,5 +1,6 @@
 library seekbar;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// SeekBar(
@@ -54,6 +55,12 @@ class SeekBar extends StatefulWidget {
   @override
   _SeekBarState createState() {
     return _SeekBarState();
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties.add(DoubleProperty('value', value));
+    super.debugFillProperties(properties);
   }
 }
 
