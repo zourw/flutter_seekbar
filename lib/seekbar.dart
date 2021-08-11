@@ -27,15 +27,15 @@ class SeekBar extends StatefulWidget {
   final Color progressColor;
   final Color secondProgressColor;
   final Color thumbColor;
-  final Function onStartTrackingTouch;
-  final ValueChanged<double> onProgressChanged;
-  final Function onStopTrackingTouch;
+  final Function? onStartTrackingTouch;
+  final ValueChanged<double>? onProgressChanged;
+  final Function? onStopTrackingTouch;
   final bool verticalPadding;
   final bool horizontalPadding;
-  final Key gestureDetectorKey;
+  final Key? gestureDetectorKey;
 
   SeekBar({
-    Key key,
+    Key? key,
     this.gestureDetectorKey,
     this.progressWidth = 2.0,
     this.thumbRadius = 7.0,
@@ -65,59 +65,61 @@ class SeekBar extends StatefulWidget {
 }
 
 class _SeekBarState extends State<SeekBar> {
-  Offset _touchPoint = Offset.zero;
-
   double _value = 0.0;
   double _secondValue = 0.0;
 
   bool _touchDown = false;
-  double _dragValue;
+  double? _dragValue;
 
-  _checkTouchPoint() {
-    if (_touchPoint.dx <= 0) {
-      _touchPoint = Offset(0, _touchPoint.dy);
+  _checkTouchPoint(BuildContext context, Offset touchPoint) {
+    if (touchPoint.dx <= 0) {
+      touchPoint = Offset(0, touchPoint.dy);
     }
-    if (_touchPoint.dx >= context.size.width) {
-      _touchPoint = Offset(context.size.width, _touchPoint.dy);
+    if (touchPoint.dx >= context.size!.width) {
+      touchPoint = Offset(context.size!.width, touchPoint.dy);
     }
   }
 
   @override
   void initState() {
-    _value = widget.value > 1 ? 1 : widget.value < 0 ? 0 : widget.value;
+    _value = widget.value > 1
+        ? 1
+        : widget.value < 0
+            ? 0
+            : widget.value;
     _secondValue = widget.secondValue > 1
         ? 1
-        : widget.secondValue < 0 ? 0 : widget.secondValue;
+        : widget.secondValue < 0
+            ? 0
+            : widget.secondValue;
     super.initState();
   }
 
   @override
   void didUpdateWidget(SeekBar oldWidget) {
-    _value = widget.value > 1 ? 1 : widget.value < 0 ? 0 : widget.value;
-    _secondValue = widget.secondValue > 1
-        ? 1
-        : widget.secondValue < 0 ? 0 : widget.secondValue;
+    _value = widget.value.clamp(0, 1);
+    _secondValue = widget.secondValue.clamp(0, 1);
     super.didUpdateWidget(oldWidget);
+  }
+
+  double updateValue(BuildContext context, Offset touchPoint) {
+    _value = touchPoint.dx / context.size!.width;
+    return _dragValue = _value;
   }
 
   @override
   Widget build(BuildContext context) {
-    void updateValue() {
-      _value = _touchPoint.dx / context.size.width;
-      _dragValue = _value;
-    }
-
     return GestureDetector(
       key: widget.gestureDetectorKey,
       onHorizontalDragDown: (details) {
         debugPrint("[SeekBar] onHorizontalDragDown");
 
-        RenderBox box = context.findRenderObject();
-        _touchPoint = box.globalToLocal(details.globalPosition);
-        _checkTouchPoint();
+        RenderBox box = context.findRenderObject() as RenderBox;
+        final touchPoint = box.globalToLocal(details.globalPosition);
+        _checkTouchPoint(context, touchPoint);
 
         setState(() {
-          updateValue();
+          updateValue(context, touchPoint);
           _touchDown = true;
         });
 
@@ -126,13 +128,14 @@ class _SeekBarState extends State<SeekBar> {
       onHorizontalDragUpdate: (details) {
         debugPrint("[SeekBar] onHorizontalDragUpdate");
 
-        RenderBox box = context.findRenderObject();
-        _touchPoint = box.globalToLocal(details.globalPosition);
-        _checkTouchPoint();
+        RenderBox box = context.findRenderObject() as RenderBox;
+        final touchPoint = box.globalToLocal(details.globalPosition);
+        _checkTouchPoint(context, touchPoint);
 
-        setState(() =>updateValue());
+        final newValue = updateValue(context, touchPoint);
+        setState(() {});
 
-        widget.onProgressChanged?.call(_dragValue);
+        widget.onProgressChanged?.call(newValue);
       },
       onHorizontalDragEnd: (details) {
         debugPrint("[SeekBar] onHorizontalDragEnd");
@@ -166,9 +169,11 @@ class _SeekBarState extends State<SeekBar> {
   }
 
   void _onGestureEnd() {
-    widget.onProgressChanged?.call(_dragValue);
+    if (_dragValue != null) {
+      widget.onProgressChanged?.call(_dragValue!);
+    }
     widget.onStopTrackingTouch?.call();
-    
+
     setState(() {
       _touchDown = false;
       _dragValue = null;
@@ -190,24 +195,22 @@ class _SeekBarPainter extends CustomPainter {
   final bool horizontalPadding;
 
   _SeekBarPainter({
-    this.progressWidth,
-    this.thumbRadius,
-    this.value,
-    this.secondValue,
-    this.barColor,
-    this.progressColor,
-    this.secondProgressColor,
-    this.thumbColor,
-    this.touchDown,
-    this.verticalPadding,
-    this.horizontalPadding,
+    required this.progressWidth,
+    required this.thumbRadius,
+    required this.value,
+    required this.secondValue,
+    required this.barColor,
+    required this.progressColor,
+    required this.secondProgressColor,
+    required this.thumbColor,
+    required this.touchDown,
+    required this.verticalPadding,
+    required this.horizontalPadding,
   });
 
   @override
   bool shouldRepaint(_SeekBarPainter old) {
-    return value != old.value ||
-        secondValue != old.secondValue ||
-        touchDown != old.touchDown;
+    return value != old.value || secondValue != old.secondValue || touchDown != old.touchDown;
   }
 
   @override
@@ -223,10 +226,8 @@ class _SeekBarPainter extends CustomPainter {
 
     final Offset startPoint = Offset(paddingX, centerY);
     final Offset endPoint = Offset(size.width - paddingX, centerY);
-    final Offset progressPoint =
-        Offset(barLength * value + paddingX, centerY);
-    final Offset secondProgressPoint =
-        Offset(barLength * secondValue + paddingX, centerY);
+    final Offset progressPoint = Offset(barLength * value + paddingX, centerY);
+    final Offset secondProgressPoint = Offset(barLength * secondValue + paddingX, centerY);
 
     paint.color = barColor;
     canvas.drawLine(startPoint, endPoint, paint);
